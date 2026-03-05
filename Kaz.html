@@ -1,0 +1,20 @@
+# Yeni PowerShell aç, bunu yapıştır:
+
+$Source = "C:\Users\$env:USERNAME\Downloads"
+$Target = "Z:\Labels"
+
+Write-Host "BC → Z:\Labels taşıma başladı..." -ForegroundColor Green
+
+while ($true) {
+    # Yeni CSV dosyalarını bul
+    $files = Get-ChildItem $Source -Filter "*.csv" -ErrorAction SilentlyContinue | 
+             Where-Object { $_.LastWriteTime -gt (Get-Date).AddSeconds(-5) }
+    
+    foreach ($file in $files) {
+        $dest = Join-Path $Target $file.Name
+        Copy-Item $file.FullName $dest -Force
+        Write-Host "$(Get-Date -Format 'HH:mm:ss') ✅ $($file.Name) → Z:\Labels" -ForegroundColor Green
+    }
+    
+    Start-Sleep -Milliseconds 500
+}
